@@ -22,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/BurningLutz/reax/issues"
   },
-  "homepage": "https://github.com/BurningLutz/reax#readme"
+  "homepage": "https://github.com/BurningLutz/reax#readme",
+  "peerDependencies": {
+    "hoist-non-react-statics": "^2.3.1",
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1"
+  }
 }
