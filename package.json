@@ -1,0 +1,24 @@
+{
+  "name": "reax",
+  "version": "0.0.0",
+  "description": "Possibly a boilerplate killer for react/redux.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BurningLutz/reax.git"
+  },
+  "keywords": [
+    "react",
+    "redux",
+    "helper"
+  ],
+  "author": "BurningLutz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BurningLutz/reax/issues"
+  },
+  "homepage": "https://github.com/BurningLutz/reax#readme"
+}
