@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src/*",
     "lint:fix": "eslint --fix src/*",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,11 @@
   "homepage": "https://github.com/BurningLutz/reax#readme",
   "peerDependencies": {
     "hoist-non-react-statics": "^2.3.1",
+    "immutable": "^3.8.1",
     "prop-types": "^15.5.10",
     "react": "^15.6.1"
+  },
+  "devDependencies": {
+    "jest": "^21.1.0"
   }
 }
