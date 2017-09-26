@@ -37,7 +37,7 @@
     "hoist-non-react-statics": "^2.3.1",
     "immutable": "^3.8.1",
     "jest": "^21.1.0",
-    "jest-nyan-reporter": "^1.0.2",
+    "jest-nyan-reporter": "https://github.com/BurningLutz/jest-nyan-reporter",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.2",
@@ -51,9 +51,7 @@
       "text"
     ],
     "reporters": [
-      [
-        "jest-nyan-reporter"
-      ]
+      "jest-nyan-reporter"
     ]
   }
 }

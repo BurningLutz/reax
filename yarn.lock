@@ -1838,9 +1838,9 @@ jest-mock@^21.1.0:
   version "21.1.0"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-21.1.0.tgz#c4dddfa893a0b120b72b5ae87c7506745213a790"
 
-jest-nyan-reporter@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/jest-nyan-reporter/-/jest-nyan-reporter-1.0.2.tgz#c061e8cbe793d1d712074e675a26133ea41d3672"
+"jest-nyan-reporter@https://github.com/BurningLutz/jest-nyan-reporter":
+  version "1.0.3"
+  resolved "https://github.com/BurningLutz/jest-nyan-reporter#9a62f66bc9f930029231b1f0bae0f7b86a72018c"
   dependencies:
     eslint-plugin-flowtype "^2.30.4"
     supports-color "^3.2.3"
