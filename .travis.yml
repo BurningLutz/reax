@@ -1,0 +1,5 @@
+language: node_js
+node_js:
+  - node
+install: yarn add eslint eslint-plugin-react babel-eslint
+script: yarn run lint && yarn test
