@@ -4,6 +4,18 @@ import hoistStatics from 'hoist-non-react-statics'
 
 import getDisplayName from './getDisplayName'
 
+/**
+ * An HOC to create auto-load components with essential hooks.
+ *
+ * @param {Object} hooks The hooks to trigger at different situation.
+ * There are 4 hooks named:
+ * - loadFn, the load function to call when component did mount.
+ * - loadingFn, the loading function to call to determine whether datas
+ *              are still loading when rendered.
+ * - unloadFn?, the upload function to call if provided when component will unmount.
+ * - reloadFn?, the reload function to call if provided when component will receive new props.
+ * @returns {Component} Initable component
+ */
 function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
   return function (WrappedComponent) {
     const connectDisplayName = `Initable(${getDisplayName(WrappedComponent)})`
