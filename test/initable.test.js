@@ -1,5 +1,6 @@
 import React from 'react'
 import TU from 'react-dom/test-utils'
+import TR from 'react-test-renderer'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
@@ -22,33 +23,27 @@ const Wrapped = wrapper(Foo)
 test('it should render null when loading', () => {
   const store = createDummyStore({ loading: true })
 
-  const tree = TU.renderIntoDocument(
+  const renderer = TR.create(
     <Provider store={store}>
       <Wrapped />
     </Provider>
   )
-  const testee = TU.findRenderedComponentWithType(
-    tree,
-    Wrapped
-  )
+  const elem = renderer.root.findByType(Wrapped).instance
 
-  expect(testee.render()).toBeFalsy()
+  expect(elem.render()).toBeFalsy()
 })
 
 test('it should render component when not loading', () => {
   const store = createDummyStore({ loading: false })
 
-  const tree = TU.renderIntoDocument(
+  const renderer = TR.create(
     <Provider store={store}>
       <Wrapped />
     </Provider>
   )
-  const testee = TU.findRenderedComponentWithType(
-    tree,
-    Wrapped
-  )
+  const elem = renderer.root.findByType(Wrapped).instance
 
-  expect(TU.isElementOfType(testee.render(), Foo)).toBeTruthy()
+  expect(TU.isElementOfType(elem.render(), Foo)).toBeTruthy()
 })
 
 test('it should call loadFn with state and props as args when mounted', () => {
@@ -63,7 +58,7 @@ test('it should call loadFn with state and props as args when mounted', () => {
 
   const props = { id: 1 }
 
-  TU.renderIntoDocument(
+  TR.create(
     <Provider store={store}>
       <Wrapped1 {...props} />
     </Provider>
@@ -84,7 +79,7 @@ test('it should call loadingFn with state and props as args when rendered', () =
 
   const props = { id: 1 }
 
-  TU.renderIntoDocument(
+  TR.create(
     <Provider store={store}>
       <Wrapped1 {...props} />
     </Provider>
@@ -105,14 +100,12 @@ test('it should call resetFn with state and props as args when unmount', () => {
 
   const props = { id: 1 }
 
-  let wrappedRef
-
-  TU.renderIntoDocument(
+  const renderer = TR.create(
     <Provider store={store}>
-      <Wrapped1 ref={(ref) => wrappedRef = ref} {...props} />
+      <Wrapped1 {...props} />
     </Provider>
   )
-  wrappedRef.componentWillUnmount()
+  renderer.unmount()
 
   expect(resetFn).toBeCalledWith(store.getState(), props)
 })
