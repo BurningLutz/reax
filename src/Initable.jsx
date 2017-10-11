@@ -4,7 +4,7 @@ import hoistStatics from 'hoist-non-react-statics'
 
 import getDisplayName from './getDisplayName'
 
-function Initable({ loadFn, loadingFn, resetFn, reloadFn }) {
+function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
   return function (WrappedComponent) {
     const connectDisplayName = `Initable(${getDisplayName(WrappedComponent)})`
     class Initable extends PureComponent {
@@ -15,14 +15,14 @@ function Initable({ loadFn, loadingFn, resetFn, reloadFn }) {
         this.subscriber = this._store.subscribe(this.onChangeState)
       }
       componentWillUnmount() {
-        resetFn && this._store.dispatch(resetFn(this._store.getState(), this.props))
+        unloadFn && this._store.dispatch(unloadFn(this._store.getState(), this.props))
         this.subscriber()
       }
       componentWillReceiveProps(props) {
         if (reloadFn) {
           this._store.dispatch(reloadFn(this._store.getState(), this.props, props))
         } else {
-          this._store.dispatch(resetFn(this._store.getState(), this.props))
+          this._store.dispatch(unloadFn(this._store.getState(), this.props))
           this._store.dispatch(loadFn(this._store.getState(), props))
         }
       }
