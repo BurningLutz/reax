@@ -10,11 +10,12 @@ function Initable({ loadFn, loadingFn, resetFn }) {
     class Initable extends PureComponent {
       componentDidMount() {
         const store = this.context.store
-        store.dispatch(loadFn())
+        store.dispatch(loadFn(store.getState(), this.props))
         this.subscriber = store.subscribe(this.onChangeState)
       }
       componentWillUnmount() {
-        resetFn && this.context.store.dispatch(resetFn())
+        const store = this.context.store
+        resetFn && store.dispatch(resetFn(store.getState(), this.props))
         this.subscriber()
       }
 

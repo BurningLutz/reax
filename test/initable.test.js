@@ -1,8 +1,7 @@
 import React from 'react'
 import TU from 'react-dom/test-utils'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
-import thunkMiddleware from 'redux-thunk'
+import { createStore } from 'redux'
 
 import Initable from '../src/Initable'
 
@@ -10,37 +9,18 @@ function Foo() {
   return <div>foo</div>
 }
 
-const LOADED = 'LOADED'
-const LOAD = 'LOAD'
-const RESET = 'RESET'
-function createTestStore() {
-  return createStore(
-    (s = { loading: true }, action) => {
-      switch(action.type) {
-      case LOADED:
-        return { ...s, loading: false }
-      case LOAD:
-        return { ...s, value: 10 }
-      case RESET:
-        return { ...s, value: null }
-      default:
-        return s
-      }
-    },
-    applyMiddleware(
-      thunkMiddleware
-    )
-  )
+function createDummyStore(preload) {
+  return createStore(x => x, preload)
 }
+
 const wrapper = Initable({
-  loadFn: () => ({ type: LOAD }),
+  loadFn: () => ({ type: 'LOAD' }),
   loadingFn: (state) => state.loading,
-  resetFn: () => ({ type: RESET })
+  resetFn: () => ({ type: 'RESET' })
 })
 const Wrapped = wrapper(Foo)
-
 test('it should render null when loading', () => {
-  const store = createTestStore()
+  const store = createDummyStore({ loading: true })
 
   const tree = TU.renderIntoDocument(
     <Provider store={store}>
@@ -56,8 +36,7 @@ test('it should render null when loading', () => {
 })
 
 test('it should render component when not loading', () => {
-  const store = createTestStore()
-  store.dispatch({ type: LOADED })
+  const store = createDummyStore({ loading: false })
 
   const tree = TU.renderIntoDocument(
     <Provider store={store}>
@@ -72,28 +51,68 @@ test('it should render component when not loading', () => {
   expect(TU.isElementOfType(testee.render(), Foo)).toBeTruthy()
 })
 
-test('it should call loadFn when mounted', () => {
-  const store = createTestStore()
+test('it should call loadFn with state and props as args when mounted', () => {
+  const store = createDummyStore()
+  const loadFn = jest.fn(() => ({ type: 'LOAD' }))
+  const wrapper1 = Initable({
+    loadFn,
+    loadingFn: () => true,
+    resetFn: () => ({ type: 'RESET' })
+  })
+  const Wrapped1 = wrapper1(Foo)
+
+  const props = { id: 1 }
 
   TU.renderIntoDocument(
     <Provider store={store}>
-      <Wrapped />
+      <Wrapped1 {...props} />
     </Provider>
   )
 
-  expect(store.getState().value).toBe(10)
+  expect(loadFn).toBeCalledWith(store.getState(), props)
 })
 
-test('it should call resetFn when unmount', () => {
-  const store = createTestStore()
+test('it should call loadingFn with state and props as args when rendered', () => {
+  const store = createDummyStore()
+  const loadingFn = jest.fn()
+  const wrapper1 = Initable({
+    loadFn: () => ({ type: 'LOAD' }),
+    loadingFn,
+    resetFn: () => ({ type: 'RESET' })
+  })
+  const Wrapped1 = wrapper1(Foo)
+
+  const props = { id: 1 }
+
+  TU.renderIntoDocument(
+    <Provider store={store}>
+      <Wrapped1 {...props} />
+    </Provider>
+  )
+
+  expect(loadingFn).toBeCalledWith(store.getState(), props)
+})
+
+test('it should call resetFn with state and props as args when unmount', () => {
+  const store = createDummyStore()
+  const resetFn = jest.fn(() => ({ type: 'RESET' }))
+  const wrapper1 = Initable({
+    loadFn: () => ({ type: 'LOAD' }),
+    loadingFn: () => true,
+    resetFn,
+  })
+  const Wrapped1 = wrapper1(Foo)
+
+  const props = { id: 1 }
+
   let wrappedRef
 
   TU.renderIntoDocument(
     <Provider store={store}>
-      <Wrapped ref={(ref) => wrappedRef = ref} />
+      <Wrapped1 ref={(ref) => wrappedRef = ref} {...props} />
     </Provider>
   )
   wrappedRef.componentWillUnmount()
 
-  expect(store.getState().value).toBeNull()
+  expect(resetFn).toBeCalledWith(store.getState(), props)
 })
