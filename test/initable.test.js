@@ -14,10 +14,15 @@ function createDummyStore(preload) {
   return createStore(x => x, preload)
 }
 
+const dummyLoadFn = () => ({ type: 'LOAD' })
+const dummyUnloadFn = () => ({ type: 'UNLOAD' })
+const dummyLoadingFn = state => state && state.loading
+const dummyReloadFn = () => ({ type: 'RELOAD' })
+
 const wrapper = Initable({
-  loadFn: () => ({ type: 'LOAD' }),
-  loadingFn: (state) => state.loading,
-  unloadFn: () => ({ type: 'UNLOAD' })
+  loadFn: dummyLoadFn,
+  loadingFn: dummyLoadingFn,
+  unloadFn: dummyUnloadFn,
 })
 const Wrapped = wrapper(Foo)
 test('it should render null when loading', () => {
@@ -32,6 +37,7 @@ test('it should render null when loading', () => {
 
   expect(elem.render()).toBeFalsy()
 })
+
 
 test('it should render component when not loading', () => {
   const store = createDummyStore({ loading: false })
@@ -48,11 +54,11 @@ test('it should render component when not loading', () => {
 
 test('it should call loadFn with state and props as args when mounted', () => {
   const store = createDummyStore()
-  const loadFn = jest.fn(() => ({ type: 'LOAD' }))
+  const loadFn = jest.fn(dummyLoadFn)
   const wrapper1 = Initable({
     loadFn,
-    loadingFn: () => true,
-    unloadFn: () => ({ type: 'UNLOAD' })
+    loadingFn: dummyLoadingFn,
+    unloadFn: dummyUnloadFn
   })
   const Wrapped1 = wrapper1(Foo)
 
@@ -71,9 +77,9 @@ test('it should call loadingFn with state and props as args when rendered', () =
   const store = createDummyStore()
   const loadingFn = jest.fn()
   const wrapper1 = Initable({
-    loadFn: () => ({ type: 'LOAD' }),
+    loadFn: dummyLoadFn,
     loadingFn,
-    unloadFn: () => ({ type: 'UNLOAD' })
+    unloadFn: dummyUnloadFn
   })
   const Wrapped1 = wrapper1(Foo)
 
@@ -88,12 +94,12 @@ test('it should call loadingFn with state and props as args when rendered', () =
   expect(loadingFn).toBeCalledWith(store.getState(), props)
 })
 
-test('it should call unloadFn with state and props as args when unmount', () => {
+test('it should call unloadFn if provided with state and props as args when unmount', () => {
   const store = createDummyStore()
-  const unloadFn = jest.fn(() => ({ type: 'UNLOAD' }))
+  const unloadFn = jest.fn(dummyUnloadFn)
   const wrapper1 = Initable({
-    loadFn: () => ({ type: 'LOAD' }),
-    loadingFn: () => true,
+    loadFn: dummyLoadFn,
+    loadingFn: dummyLoadingFn,
     unloadFn,
   })
   const Wrapped1 = wrapper1(Foo)
@@ -108,15 +114,30 @@ test('it should call unloadFn with state and props as args when unmount', () => 
   renderer.unmount()
 
   expect(unloadFn).toBeCalledWith(store.getState(), props)
+
+  const wrapper2 = Initable({
+    loadFn: dummyLoadFn,
+    loadingFn: dummyLoadingFn,
+  })
+  const Wrapped2 = wrapper2(Foo)
+
+  expect(() => {
+    const renderer = TR.create(
+      <Provider store={store}>
+        <Wrapped2 />
+      </Provider>
+    )
+    renderer.unmount()
+  }).not.toThrow()
 })
 
 test('it should call unloadFn & loadFn in order if reloadFn is not provided when received new props', () => {
   const store = createDummyStore()
-  const loadFn = jest.fn(() => ({ type: 'LOAD' }))
-  const unloadFn = jest.fn(() => ({ type: 'UNLOAD' }))
+  const loadFn = jest.fn(dummyLoadFn)
+  const unloadFn = jest.fn(dummyUnloadFn)
   const wrapper1 = Initable({
     loadFn,
-    loadingFn: () => false,
+    loadingFn: dummyLoadingFn,
     unloadFn,
   })
   const Wrapped1 = wrapper1(Foo)
@@ -137,15 +158,35 @@ test('it should call unloadFn & loadFn in order if reloadFn is not provided when
 
   expect(unloadFn).toBeCalledWith(store.getState(), oldProps)
   expect(loadFn).toBeCalledWith(store.getState(), newProps)
+
+  const wrapper2 = Initable({
+    loadFn: dummyLoadFn,
+    loadingFn: dummyLoadingFn,
+  })
+  const Wrapped2 = wrapper2(Foo)
+  expect(() => {
+    const renderer = TR.create(
+      <Provider store={store}>
+        <Wrapped2 {...oldProps} />
+      </Provider>
+    )
+    renderer.update(
+      <Provider store={store}>
+        <Wrapped2 {...newProps} />
+      </Provider>
+    )
+  }).not.toThrow()
 })
 
 test('it should call reloadFn if provided when received new props', () => {
   const store = createDummyStore()
-  const reloadFn = jest.fn(() => ({ type: 'RELOAD' }))
+  const reloadFn = jest.fn(dummyReloadFn)
+  const loadFn = jest.fn(dummyLoadFn)
+  const unloadFn = jest.fn(dummyUnloadFn)
   const wrapper1 = Initable({
-    loadFn: () => ({ type: 'LOAD' }),
-    loadingFn: () => false,
-    unloadFn: () => ({ type: 'UNLOAD' }),
+    loadFn,
+    loadingFn: dummyLoadingFn,
+    unloadFn,
     reloadFn,
   })
   const Wrapped1 = wrapper1(Foo)
@@ -158,6 +199,8 @@ test('it should call reloadFn if provided when received new props', () => {
       <Wrapped1 {...oldProps} />
     </Provider>
   )
+  expect(loadFn).toHaveBeenCalledTimes(1)
+
   renderer.update(
     <Provider store={store}>
       <Wrapped1 {...newProps} />
@@ -165,4 +208,6 @@ test('it should call reloadFn if provided when received new props', () => {
   )
 
   expect(reloadFn).toBeCalledWith(store.getState(), oldProps, newProps)
+  expect(loadFn).toHaveBeenCalledTimes(1)
+  expect(unloadFn).not.toBeCalled()
 })

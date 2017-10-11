@@ -34,7 +34,7 @@ function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
         if (reloadFn) {
           this._store.dispatch(reloadFn(this._store.getState(), this.props, props))
         } else {
-          this._store.dispatch(unloadFn(this._store.getState(), this.props))
+          unloadFn && this._store.dispatch(unloadFn(this._store.getState(), this.props))
           this._store.dispatch(loadFn(this._store.getState(), props))
         }
       }
