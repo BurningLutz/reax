@@ -4,18 +4,27 @@ import hoistStatics from 'hoist-non-react-statics'
 
 import getDisplayName from './getDisplayName'
 
-function Initable({ loadFn, loadingFn, resetFn }) {
+function Initable({ loadFn, loadingFn, resetFn, reloadFn }) {
   return function (WrappedComponent) {
     const connectDisplayName = `Initable(${getDisplayName(WrappedComponent)})`
     class Initable extends PureComponent {
+      _store = this.context.store
+
       componentDidMount() {
-        const store = this.context.store
-        store.dispatch(loadFn())
-        this.subscriber = store.subscribe(this.onChangeState)
+        this._store.dispatch(loadFn(this._store.getState(), this.props))
+        this.subscriber = this._store.subscribe(this.onChangeState)
       }
       componentWillUnmount() {
-        resetFn && this.context.store.dispatch(resetFn())
+        resetFn && this._store.dispatch(resetFn(this._store.getState(), this.props))
         this.subscriber()
+      }
+      componentWillReceiveProps(props) {
+        if (reloadFn) {
+          this._store.dispatch(reloadFn(this._store.getState(), this.props, props))
+        } else {
+          this._store.dispatch(resetFn(this._store.getState(), this.props))
+          this._store.dispatch(loadFn(this._store.getState(), props))
+        }
       }
 
       onChangeState = () => {
@@ -23,7 +32,7 @@ function Initable({ loadFn, loadingFn, resetFn }) {
       }
 
       render() {
-        return !loadingFn(this.context.store.getState(), this.props) && createElement(WrappedComponent, this.props)
+        return !loadingFn(this._store.getState(), this.props) && createElement(WrappedComponent, this.props)
       }
     }
 
