@@ -14,17 +14,17 @@ function _ca(type, payload, status) {
   return action
 }
 
-const _id = id => id
+const _idOrSpread = (...args) => args.length > 1 ? args : args[0]
 export const spread = (...args) => args
 /**
  * Create action creator.
  *
  * @param {String} type action type
- * @param {Function} [payload=_id] payload creator
+ * @param {Function} [payload=_idOrSpread] payload creator
  * @param {String} status optional status for async action
  * @returns {Function} action creator
  */
-export function ca(type, payload = _id, status) {
+export function ca(type, payload = _idOrSpread, status) {
   return (...args) => _ca(type, payload(...args), status)
 }
 
@@ -32,10 +32,10 @@ export function ca(type, payload = _id, status) {
  * Create async action creator.
  *
  * @param {String} type action type
- * @param {Function} [payload=_id] payload creator
+ * @param {Function} [payload=_idOrSpread] payload creator
  * @returns {Object} shape of { pending, resolve, reject }, each field stands for the specific action creator
  */
-export function caa(type, payload = _id) {
+export function caa(type, payload = _idOrSpread) {
   return {
     pending: ca(type, payload),
     resolve: ca(type, payload, 'resolved'),

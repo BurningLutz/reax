@@ -1,6 +1,6 @@
 import { ca, caa, spread } from '../src/ca'
 
-test('action creator with specific type', () => {
+test('action creator with specific type and a single param', () => {
   const type    = 'FOO'
   const creator = ca(type)
   let action
@@ -10,6 +10,14 @@ test('action creator with specific type', () => {
 
   action = creator(1)
   expect(action).toEqual({ type, payload: 1 })
+})
+
+test('action creator with specific type and many params', () => {
+  const type    = 'FOO'
+  const creator = ca(type)
+  const action  = creator(1, 2, 3)
+
+  expect(action).toEqual({ type, payload: [1, 2, 3] })
 })
 
 test('action creator with specific type and payload creator', () => {
