@@ -1,6 +1,6 @@
 {
   "name": "reax",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Possibly a boilerplate killer for react/redux.",
   "main": "src/index.js",
   "scripts": {
