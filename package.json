@@ -61,5 +61,8 @@
     "reporters": [
       "jest-nyan-reporter"
     ]
+  },
+  "dependencies": {
+    "object-equal": "^1.0.0"
   }
 }
