@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { PureComponent, createElement } from 'react'
 import hoistStatics from 'hoist-non-react-statics'
+import isEqual from 'object-equal'
 
 import getDisplayName from './getDisplayName'
 
@@ -31,6 +32,11 @@ function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
         this.subscriber()
       }
       componentWillReceiveProps(props) {
+        // this check is to ensure props DO changed.
+        if (isEqual(this.props, props)) {
+          return
+        }
+
         if (reloadFn) {
           this._store.dispatch(reloadFn(this._store.getState(), this.props, props))
         } else {
@@ -40,7 +46,7 @@ function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
       }
 
       onChangeState = () => {
-        this.setState({}) // NOTE: Only for triggering update
+        this.forceUpdate() // NOTE: Only for triggering update
       }
 
       render() {

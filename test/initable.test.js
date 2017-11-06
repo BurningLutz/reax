@@ -178,7 +178,7 @@ test('it should call unloadFn & loadFn in order if reloadFn is not provided when
   }).not.toThrow()
 })
 
-test('it should call reloadFn if provided when received new props', () => {
+test('it should call reloadFn if provided when received new props, but should NOT call reloadFn when received the same props', () => {
   const store = createDummyStore()
   const reloadFn = jest.fn(dummyReloadFn)
   const loadFn = jest.fn(dummyLoadFn)
@@ -206,8 +206,16 @@ test('it should call reloadFn if provided when received new props', () => {
       <Wrapped1 {...newProps} />
     </Provider>
   )
+  // call update twice with the same props to simulate `componentWillReceiveProps`
+  // with same props
+  renderer.update(
+    <Provider store={store}>
+      <Wrapped1 {...newProps} />
+    </Provider>
+  )
 
   expect(reloadFn).toBeCalledWith(store.getState(), oldProps, newProps)
+  expect(reloadFn).toHaveBeenCalledTimes(1)
   expect(loadFn).toHaveBeenCalledTimes(1)
   expect(unloadFn).not.toBeCalled()
 })
