@@ -7,6 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var PropTypes = _interopDefault(require('prop-types'));
 var react = require('react');
 var hoistStatics = _interopDefault(require('hoist-non-react-statics'));
+var isEqual = _interopDefault(require('object-equal'));
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -56,7 +57,7 @@ function Initable(_ref) {
         }
 
         return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref2 = Initable.__proto__ || Object.getPrototypeOf(Initable)).call.apply(_ref2, [this].concat(args))), _this), _this._store = _this.context.store, _this.onChangeState = function () {
-          _this.setState({}); // NOTE: Only for triggering update
+          _this.forceUpdate(); // NOTE: Only for triggering update
         }, _temp), _possibleConstructorReturn(_this, _ret);
       }
 
@@ -75,6 +76,11 @@ function Initable(_ref) {
       }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(props) {
+          // this check is to ensure props DO changed.
+          if (isEqual(this.props, props)) {
+            return;
+          }
+
           if (reloadFn) {
             this._store.dispatch(reloadFn(this._store.getState(), this.props, props));
           } else {

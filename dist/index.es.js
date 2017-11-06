@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { PureComponent, createElement } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
+import isEqual from 'object-equal';
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -50,7 +51,7 @@ function Initable(_ref) {
         }
 
         return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref2 = Initable.__proto__ || Object.getPrototypeOf(Initable)).call.apply(_ref2, [this].concat(args))), _this), _this._store = _this.context.store, _this.onChangeState = function () {
-          _this.setState({}); // NOTE: Only for triggering update
+          _this.forceUpdate(); // NOTE: Only for triggering update
         }, _temp), _possibleConstructorReturn(_this, _ret);
       }
 
@@ -69,6 +70,11 @@ function Initable(_ref) {
       }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(props) {
+          // this check is to ensure props DO changed.
+          if (isEqual(this.props, props)) {
+            return;
+          }
+
           if (reloadFn) {
             this._store.dispatch(reloadFn(this._store.getState(), this.props, props));
           } else {
