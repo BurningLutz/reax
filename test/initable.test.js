@@ -219,3 +219,23 @@ test('it should call reloadFn if provided when received new props, but should NO
   expect(loadFn).toHaveBeenCalledTimes(1)
   expect(unloadFn).not.toBeCalled()
 })
+
+test('render should be called when loadFn brings update to store', () => {
+  const store = createDummyStore()
+  const loadingFn = jest.fn(dummyLoadingFn)
+  const wrapper1 = Initable({
+    loadFn: dummyLoadFn,
+    loadingFn,
+    unloadFn: dummyUnloadFn,
+    reloadFn: dummyReloadFn,
+  })
+  const Wrapped1 = wrapper1(Foo)
+
+  TR.create(
+    <Provider store={store}>
+      <Wrapped1 />
+    </Provider>
+  )
+
+  expect(loadingFn).toHaveBeenCalledTimes(2)
+})
