@@ -58,8 +58,8 @@ function Initable(_ref) {
       _createClass(Initable, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-          this._store.dispatch(loadFn(this._store.getState(), this.props));
           this.subscriber = this._store.subscribe(this.onChangeState);
+          this._store.dispatch(loadFn(this._store.getState(), this.props));
         }
       }, {
         key: 'componentWillUnmount',
