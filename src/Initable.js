@@ -24,8 +24,8 @@ function Initable({ loadFn, loadingFn, unloadFn, reloadFn }) {
       _store = this.context.store
 
       componentDidMount() {
-        this._store.dispatch(loadFn(this._store.getState(), this.props))
         this.subscriber = this._store.subscribe(this.onChangeState)
+        this._store.dispatch(loadFn(this._store.getState(), this.props))
       }
       componentWillUnmount() {
         unloadFn && this._store.dispatch(unloadFn(this._store.getState(), this.props))
